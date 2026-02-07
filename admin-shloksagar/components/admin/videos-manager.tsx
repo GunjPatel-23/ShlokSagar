@@ -79,6 +79,7 @@ export default function VideosManager() {
         title: video.title_en || '',
         video_url: video.video_url,
         description: video.description_en || '',
+        mediaType: 'video',
         uploadedDate: video.created_at ? new Date(video.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
       })
     } else {
