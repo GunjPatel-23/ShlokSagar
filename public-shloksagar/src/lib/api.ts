@@ -1,4 +1,11 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1/public';
+// Default API target: prefer configured VITE_API_URL, else if running on the
+// production hostname use the deployed backend alias. This avoids relying on
+// build-time env vars when those are missing in deployment.
+const defaultApiUrl = (typeof window !== 'undefined' && window.location.hostname === 'www.shloksagar.in')
+    ? 'https://api.shloksagar.in/api/v1/public'
+    : 'http://localhost:3000/api/v1/public';
+
+const API_URL = import.meta.env.VITE_API_URL || defaultApiUrl;
 
 console.log('🔗 API_URL:', API_URL);
 
