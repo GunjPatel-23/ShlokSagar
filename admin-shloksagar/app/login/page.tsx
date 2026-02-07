@@ -8,6 +8,9 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
+// Force dynamic rendering - login page should not be statically generated
+export const dynamic = 'force-dynamic'
+
 export default function AdminLogin() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
