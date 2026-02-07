@@ -295,7 +295,7 @@ export default function TextContentManager({
 
   const filteredItems = items.filter((item) => {
     const searchLower = searchTerm.toLowerCase()
-    const titleText = item.title_en || item.title_hi || item.title_gu || ''
+    const titleText = (item as any).title_en || (item as any).title_hi || (item as any).title_gu || item.title || ''
     const matchesSearch =
       titleText.toLowerCase().includes(searchLower) ||
       (item.slug || '').toLowerCase().includes(searchLower)
