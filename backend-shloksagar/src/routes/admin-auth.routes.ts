@@ -76,7 +76,7 @@ router.put('/password', authenticateAdmin, async (req: Request, res: Response) =
 router.put('/:id/deactivate', authenticateAdmin, async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        await adminAuthService.deactivateAdmin(id);
+        await adminAuthService.deactivateAdmin(String(id));
         res.json({ message: 'Admin deactivated successfully' });
     } catch (error: any) {
         console.error('Deactivate admin error:', error);
@@ -88,7 +88,7 @@ router.put('/:id/deactivate', authenticateAdmin, async (req: Request, res: Respo
 router.put('/:id/activate', authenticateAdmin, async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        await adminAuthService.activateAdmin(id);
+        await adminAuthService.activateAdmin(String(id));
         res.json({ message: 'Admin activated successfully' });
     } catch (error: any) {
         console.error('Activate admin error:', error);

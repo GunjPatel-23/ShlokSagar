@@ -92,6 +92,21 @@ export async function trackDownload(
     });
 }
 
+// Track video play event
+export async function trackVideoPlay(
+    sessionId: string,
+    videoId: string,
+    durationSeconds?: number,
+    completed?: boolean
+) {
+    await supabase.from('video_play_events').insert({
+        session_id: sessionId,
+        video_id: videoId,
+        play_duration_seconds: durationSeconds,
+        completed: completed || false
+    });
+}
+
 // Get date range for filters
 export function getDateRange(filter: string): { startDate: Date; endDate: Date } {
     const now = new Date();
@@ -109,11 +124,16 @@ export function getDateRange(filter: string): { startDate: Date; endDate: Date }
             endDate.setDate(endDate.getDate() - 1);
             endDate.setHours(23, 59, 59, 999);
             break;
+        case '7d':
         case 'week':
             startDate.setDate(startDate.getDate() - 7);
             break;
+        case '30d':
         case 'month':
-            startDate.setMonth(startDate.getMonth() - 1);
+            startDate.setDate(startDate.getDate() - 30);
+            break;
+        case '90d':
+            startDate.setDate(startDate.getDate() - 90);
             break;
         case 'year':
             startDate.setFullYear(startDate.getFullYear() - 1);
@@ -122,7 +142,8 @@ export function getDateRange(filter: string): { startDate: Date; endDate: Date }
             startDate = new Date('2024-01-01'); // Platform start date
             break;
         default:
-            // For custom range, handled separately
+            // Default to 7 days
+            startDate.setDate(startDate.getDate() - 7);
             break;
     }
 
@@ -185,32 +206,87 @@ export async function getLanguageStats(startDate: Date, endDate: Date) {
     return data;
 }
 
+// Get video play stats
+export async function getVideoPlayStats(startDate: Date, endDate: Date) {
+    const { data, error } = await supabase.rpc('get_video_play_stats', {
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString()
+    });
+
+    if (error) throw error;
+    return data;
+}
+
+// Get top videos
+export async function getTopVideos(startDate: Date, endDate: Date, limit = 10) {
+    const { data, error } = await supabase.rpc('get_top_videos', {
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+        limit_count: limit
+    });
+
+    if (error) throw error;
+    return data;
+}
+
+// Get hourly traffic distribution
+export async function getHourlyTraffic(startDate: Date, endDate: Date) {
+    const { data, error } = await supabase.rpc('get_hourly_traffic', {
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString()
+    });
+
+    if (error) throw error;
+    return data;
+}
+
+// Get device stats
+export async function getUserAgentStats(startDate: Date, endDate: Date) {
+    const { data, error } = await supabase.rpc('get_user_agent_stats', {
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString()
+    });
+
+    if (error) throw error;
+    return data;
+}
+
 // Get comprehensive analytics dashboard data
 export async function getDashboardAnalytics(filter: string, customStart?: Date, customEnd?: Date) {
     let { startDate, endDate } = customStart && customEnd
         ? { startDate: customStart, endDate: customEnd }
         : getDateRange(filter);
 
-    const [visits, topPages, categoryInterest, contentTypes, languages] = await Promise.all([
+    const [visits, topPages, categoryInterest, contentTypes, languages, videoPlays, topVideos, hourlyTraffic, deviceStats] = await Promise.all([
         getSiteVisitsStats(startDate, endDate),
         getTopPages(startDate, endDate, 10),
         getCategoryInterestStats(startDate, endDate),
         getContentTypeStats(startDate, endDate),
-        getLanguageStats(startDate, endDate)
+        getLanguageStats(startDate, endDate),
+        getVideoPlayStats(startDate, endDate).catch(() => []), // Graceful fail if table doesn't exist yet
+        getTopVideos(startDate, endDate, 10).catch(() => []),
+        getHourlyTraffic(startDate, endDate).catch(() => []),
+        getUserAgentStats(startDate, endDate).catch(() => [])
     ]);
 
-    // Calculate total visits
+    // Calculate totals
     const totalVisits = visits.reduce((sum: number, day: any) => sum + Number(day.unique_visits), 0);
     const totalPageViews = visits.reduce((sum: number, day: any) => sum + Number(day.total_page_views), 0);
+    const totalVideoPlays = videoPlays.reduce((sum: number, day: any) => sum + Number(day.total_plays || 0), 0);
 
     return {
         totalVisits,
         totalPageViews,
+        totalVideoPlays,
         visitsOverTime: visits,
         topPages,
         categoryInterest,
         contentTypes,
-        languages
+        languages,
+        videoPlaysOverTime: videoPlays,
+        topVideos,
+        hourlyTraffic,
+        deviceStats
     };
 }
 

@@ -44,9 +44,16 @@ import { adminApi } from '@/lib/api'
 
 interface TextContent {
   id: string
+  title_en?: string
+  title_hi?: string
+  title_gu?: string
+  content_en?: string
+  content_hi?: string
+  content_gu?: string
   title: string
   content: string
   category: string
+  category_id?: string
   language: 'gujarati' | 'hindi' | 'english'
   metaTitle: string
   metaDescription: string

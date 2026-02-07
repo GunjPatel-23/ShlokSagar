@@ -24,6 +24,7 @@ const envSchema = z.object({
     // Google OAuth (optional)
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+    GOOGLE_CALLBACK_URL: z.string().url().optional(),
 });
 
 const _env = envSchema.safeParse(process.env);

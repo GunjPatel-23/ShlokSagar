@@ -76,7 +76,7 @@ app.use('/api/v1/admin', adminRoutes);
 app.get('/auth/google', (req, res) => {
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${env.GOOGLE_CLIENT_ID}` +
-        `&redirect_uri=${encodeURIComponent(env.GOOGLE_CALLBACK_URL)}` +
+        `&redirect_uri=${encodeURIComponent(env.GOOGLE_CALLBACK_URL || '')}` +
         `&response_type=code` +
         `&scope=${encodeURIComponent('openid email profile')}` +
         `&access_type=offline` +
@@ -130,7 +130,7 @@ app.get('/auth/google/callback', async (req, res) => {
             headers: { Authorization: `Bearer ${tokens.access_token}` }
         });
 
-        const googleUser = await userResponse.json();
+        const googleUser: any = await userResponse.json();
         console.log('Google user info', googleUser);
 
         // Create or update user in database

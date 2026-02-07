@@ -34,17 +34,55 @@ router.get('/analytics/dashboard', async (req, res) => {
 
         const topPages = analytics.topPages?.map((page: any) => ({
             path: page.path,
+            title: page.page_title || page.path,
             views: Number(page.view_count) || 0,
-            title: page.page_title || page.path
+            unique_visitors: Number(page.unique_visitors) || 0
+        })) || [];
+
+        const videoPlays = analytics.videoPlaysOverTime?.map((day: any) => ({
+            date: day.date,
+            plays: Number(day.total_plays) || 0,
+            uniqueViewers: Number(day.unique_viewers) || 0,
+            avgDuration: Number(day.avg_duration_seconds) || 0
+        })) || [];
+
+        const topVideos = analytics.topVideos?.map((video: any) => ({
+            videoId: video.video_id,
+            playCount: Number(video.play_count) || 0,
+            uniqueViewers: Number(video.unique_viewers) || 0,
+            avgDuration: Number(video.avg_duration) || 0,
+            completionRate: Number(video.completion_rate) || 0
+        })) || [];
+
+        const hourlyTraffic = analytics.hourlyTraffic?.map((hour: any) => ({
+            hour: Number(hour.hour),
+            views: Number(hour.visit_count) || 0
+        })) || [];
+
+        const deviceStats = analytics.deviceStats?.map((device: any) => ({
+            name: device.device_type,
+            views: Number(device.count) || 0
         })) || [];
 
         res.json({
             success: true,
             data: {
-                daily,
-                topPages,
+                // Overview stats
                 totalViews: analytics.totalPageViews || 0,
                 totalVisitors: analytics.totalVisits || 0,
+                totalVideoPlays: analytics.totalVideoPlays || 0,
+
+                // Time series data
+                daily,
+                videoPlays,
+
+                // Top content
+                topPages,
+                topVideos,
+
+                // Distribution data
+                hourlyTraffic,
+                deviceStats,
                 categoryInterest: analytics.categoryInterest || [],
                 contentTypes: analytics.contentTypes || [],
                 languages: analytics.languages || []

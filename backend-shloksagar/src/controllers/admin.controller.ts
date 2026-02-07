@@ -130,7 +130,7 @@ export const adminController = {
                 if (!updates.type) return res.status(400).json({ success: false, error: 'type cannot be empty' });
             }
 
-            const data = await contentService.updateDevotionalContent(id, updates as any);
+            const data = await contentService.updateDevotionalContent(String(id), updates as any);
             res.json({ success: true, data });
         } catch (err: any) {
             const msg = err?.message || String(err);
@@ -248,7 +248,7 @@ export const adminController = {
         try {
             const { id } = req.params;
             const updates = req.body;
-            const data = await contentService.updateGitaSandesh(id, updates);
+            const data = await contentService.updateGitaSandesh(String(id), updates);
             res.json({ success: true, data });
         } catch (err: any) {
             res.status(500).json({ success: false, error: err.message });
@@ -297,7 +297,7 @@ export const adminController = {
         try {
             const { id } = req.params;
             const updates = req.body;
-            const data = await contentService.updateQuote(id, updates);
+            const data = await contentService.updateQuote(String(id), updates);
             res.json({ success: true, data });
         } catch (err: any) {
             res.status(500).json({ success: false, error: err.message });
@@ -346,7 +346,7 @@ export const adminController = {
         try {
             const { id } = req.params;
             const updates = req.body;
-            const data = await contentService.updateWallpaper(id, updates);
+            const data = await contentService.updateWallpaper(String(id), updates);
             res.json({ success: true, data });
         } catch (err: any) {
             res.status(500).json({ success: false, error: err.message });
@@ -395,7 +395,7 @@ export const adminController = {
         try {
             const { id } = req.params;
             const updates = req.body;
-            const data = await contentService.updateVideo(id, updates);
+            const data = await contentService.updateVideo(String(id), updates);
             res.json({ success: true, data });
         } catch (err: any) {
             res.status(500).json({ success: false, error: err.message });
